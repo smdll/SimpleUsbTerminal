@@ -3,11 +3,14 @@ package de.kai_morich.simple_usb_terminal;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.ListFragment;
+
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -40,11 +43,19 @@ public class DevicesFragment extends ListFragment {
 
     private ArrayList<ListItem> listItems = new ArrayList<>();
     private ArrayAdapter<ListItem> listAdapter;
-    private int baudRate = 19200;
+    private SharedPreferences prefs;
+    private int baudRate;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        prefs = getActivity().getSharedPreferences("pref", Context.MODE_PRIVATE);
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        baudRate = prefs.getInt("BaudRate", 9600);
         setHasOptionsMenu(true);
         listAdapter = new ArrayAdapter<ListItem>(getActivity(), 0, listItems) {
             @Override
@@ -102,6 +113,9 @@ public class DevicesFragment extends ListFragment {
             builder.setSingleChoiceItems(baudRates, pos, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int item) {
                     baudRate = Integer.valueOf(baudRates[item]);
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putInt("BaudRate", baudRate);
+                    editor.apply();
                     dialog.dismiss();
                 }
             });
