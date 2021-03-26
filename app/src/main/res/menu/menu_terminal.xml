@@ -7,7 +7,7 @@
         android:title="Clear"
         app:showAsAction="always" />
     <item
-        android:id="@+id/newline"
+        android:id="@+id/newLine"
         android:title="Newline"
         app:showAsAction="never" />
     <item
@@ -24,4 +24,7 @@
         android:id="@+id/sendBreak"
         android:title="Send BREAK"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/saveFile"
+        android:title="Save Log" />
 </menu>

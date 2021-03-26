@@ -13,6 +13,7 @@ import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -40,8 +41,14 @@ import com.hoho.android.usbserial.driver.UsbSerialDriver;
 import com.hoho.android.usbserial.driver.UsbSerialPort;
 import com.hoho.android.usbserial.driver.UsbSerialProber;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.EnumSet;
+import java.util.Locale;
 
 public class TerminalFragment extends Fragment implements ServiceConnection, SerialListener {
 
@@ -196,7 +203,20 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
         if (id == R.id.clear) {
             receiveText.setText("");
             return true;
-        } else if (id == R.id.newline) {
+        } else if (id == R.id.saveFile) {
+            Date now = new Date();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_hh:mm:ss");
+            String dateStr = sdf.format(now.getTime());
+            File outputFile = new File(Environment.getExternalStorageDirectory() + "/" + dateStr + ".log");
+            try {
+                FileOutputStream stream = new FileOutputStream(outputFile);
+                stream.write(receiveText.getText().toString().getBytes());
+                stream.close();
+                Toast.makeText(getActivity(), "Log saved to " + outputFile, Toast.LENGTH_SHORT).show();
+            } catch (IOException e) {
+                Toast.makeText(getActivity(), "Log not saved"+e.toString(), Toast.LENGTH_SHORT).show();
+            }
+        } else if (id == R.id.newLine) {
             String[] newlineNames = getResources().getStringArray(R.array.newline_names);
             String[] newlineValues = getResources().getStringArray(R.array.newline_values);
             int pos = java.util.Arrays.asList(newlineValues).indexOf(newline);
@@ -237,6 +257,7 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
         } else {
             return super.onOptionsItemSelected(item);
         }
+        return true;
     }
 
     /*
